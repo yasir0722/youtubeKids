@@ -1,0 +1,55 @@
+{
+  "name": "YouTube Kids - Custom Player",
+  "short_name": "YouTube Kids",
+  "description": "A curated video platform for children with safe, educational content from Google Sheets",
+  "start_url": "/youtubeKids/",
+  "display": "standalone",
+  "background_color": "#f9f9f9",
+  "theme_color": "#ff0000",
+  "orientation": "portrait-primary",
+  "scope": "/youtubeKids/",
+  "lang": "en",
+  "categories": ["education", "kids", "entertainment"],
+  "screenshots": [
+    {
+      "src": "/youtubeKids/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/youtubeKids/screenshot-narrow.png", 
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/youtubeKids/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/youtubeKids/icon-512x512.png",
+      "sizes": "512x512", 
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Browse Videos",
+      "short_name": "Videos",
+      "description": "Browse available videos",
+      "url": "/youtubeKids/",
+      "icons": [
+        {
+          "src": "/youtubeKids/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
