@@ -26,13 +26,13 @@
   ],
   "icons": [
     {
-      "src": "/youtubeKids/icon-192x192.png",
+      "src": "https://www.youtube.com/s/desktop/12d6b690/img/favicon_192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/youtubeKids/icon-512x512.png",
+      "src": "https://www.youtube.com/s/desktop/12d6b690/img/favicon_512x512.png",
       "sizes": "512x512", 
       "type": "image/png",
       "purpose": "maskable any"
@@ -46,7 +46,7 @@
       "url": "/youtubeKids/",
       "icons": [
         {
-          "src": "/youtubeKids/icon-192x192.png",
+          "src": "https://www.youtube.com/s/desktop/12d6b690/img/favicon_192x192.png",
           "sizes": "192x192"
         }
       ]

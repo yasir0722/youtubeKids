@@ -9,7 +9,8 @@ export const config = {
     columns: {
       title: 'title',
       url: 'url', 
-      description: 'description'
+      description: 'description',
+      type: 'type'  // New column for video categories
     }
   },
 
@@ -45,7 +46,50 @@ export const config = {
     {
       title: "Bluey - Dance Mode! | Kids Songs", 
       url: "https://www.youtube.com/watch?v=ScMzIvxBSi4",
-      description: "Join Bluey and Bingo for some dancing fun with catchy tunes."
+      description: "Join Bluey and Bingo for some dancing fun with catchy tunes.",
+      type: "Music"
+    },
+    {
+      title: "Educational Numbers 1-10",
+      url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      description: "Learn to count from 1 to 10 with fun animations.",
+      type: "Education"
+    },
+    {
+      title: "Animal Sounds for Kids",
+      url: "https://www.youtube.com/watch?v=e_04ZrNroTo",
+      description: "Learn what sounds different animals make.",
+      type: "Education"
+    },
+    {
+      title: "Kids Yoga and Exercise",
+      url: "https://www.youtube.com/watch?v=vTIIMJ9tUc8",
+      description: "Fun yoga poses and exercises for children.",
+      type: "Exercise"
+    },
+    {
+      title: "Storytime - Three Little Pigs",
+      url: "https://www.youtube.com/watch?v=wxrbOVeRonQ",
+      description: "Classic fairy tale story for bedtime.",
+      type: "Stories"
+    },
+    {
+      title: "ABC Learning Song",
+      url: "https://www.youtube.com/watch?v=CeNLyzKhXKA",
+      description: "Learn the alphabet with this catchy song.",
+      type: "Music"
     }
+  ],
+
+  // Default video types
+  defaultTypes: [
+    "All",
+    "Education", 
+    "Music",
+    "Stories",
+    "Exercise",
+    "Games",
+    "Science",
+    "Art"
   ]
 }

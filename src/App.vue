@@ -36,10 +36,36 @@
                 </div>
 
                 <!-- Videos Grid -->
-                <div v-else> 
+                <div v-else>
+                    <!-- Simple Filter Dropdown -->
+                    <div class="filter-section">
+                        <div class="filter-controls">
+                            <label for="type-filter" class="filter-label">Filter by Type:</label>
+                            <select 
+                                id="type-filter" 
+                                v-model="selectedType" 
+                                class="type-select"
+                                @change="filterVideos"
+                            >
+                                <option value="All">All Types</option>
+                                <option 
+                                    v-for="type in availableTypes" 
+                                    :key="type" 
+                                    :value="type"
+                                >
+                                    {{ type }}
+                                </option>
+                            </select>
+                            <span class="filter-count">
+                                {{ filteredVideos.length }} of {{ videos.length }} videos
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Video Grid -->
                     <div class="video-grid">
                         <div 
-                            v-for="video in videos" 
+                            v-for="video in filteredVideos" 
                             :key="video.id"
                             class="video-card"
                             @click="openVideo(video)"
@@ -51,11 +77,17 @@
                             <div class="video-info">
                                 <h3 class="video-title">{{ video.title }}</h3>
                                 <p class="video-description">{{ video.description }}</p>
+                                <span class="video-type">{{ video.type || 'Uncategorized' }}</span>
                             </div>
                         </div>
                     </div>
-                    <div>
-                        <span v-if="videos.length > 0">{{ videos.length }} videos available</span>
+                    
+                    <!-- Video Count -->
+                    <div class="video-stats">
+                        <span v-if="videos.length > 0">
+                            Showing {{ filteredVideos.length }} of {{ videos.length }} videos
+                            <span v-if="selectedType !== 'All'"> in "{{ selectedType }}"</span>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -84,7 +116,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { GoogleSheetsService } from './services/googleSheets.js'
 import { config } from './config.js'
 
@@ -96,6 +128,11 @@ export default {
         const error = ref(null)
         const selectedVideo = ref(null)
         const isDarkMode = ref(false)
+
+        // Filter management
+        const selectedType = ref('All')
+        const availableTypes = ref([])
+        const filteredVideos = ref([])
 
         // Mobile detection
         const isMobile = ref(false)
@@ -166,6 +203,10 @@ export default {
                     }
                 }
 
+                // Initialize types and filters after loading videos
+                initializeTypes()
+                filterVideos()
+
             } catch (err) {
                 console.error('Error fetching videos:', err)
                 error.value = config.app.useSampleData 
@@ -175,6 +216,29 @@ export default {
                 loading.value = false
             }
         }
+
+        // Initialize available types from videos and config
+        const initializeTypes = () => {
+            const videoTypes = [...new Set(videos.value.map(video => video.type).filter(Boolean))]
+            const allTypes = [...new Set([...config.defaultTypes.slice(1), ...videoTypes])]
+            availableTypes.value = allTypes.sort()
+        }
+
+        // Filter videos by selected type
+        const filterVideos = () => {
+            if (selectedType.value === 'All') {
+                filteredVideos.value = videos.value
+            } else {
+                filteredVideos.value = videos.value.filter(video => 
+                    video.type === selectedType.value
+                )
+            }
+        }
+
+        // Watch for type changes to trigger filtering
+        watch(selectedType, () => {
+            filterVideos()
+        })
 
         const openVideo = (video) => {
             selectedVideo.value = video
@@ -219,9 +283,13 @@ export default {
             selectedVideo,
             isDarkMode,
             isMobile,
+            selectedType,
+            filteredVideos,
+            availableTypes,
             openVideo,
             closeVideo,
-            toggleTheme
+            toggleTheme,
+            filterVideos
         }
     }
 }

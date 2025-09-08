@@ -1,0 +1,5 @@
+<svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="192" rx="24" fill="#FF0000"/>
+  <polygon points="72,64 72,128 120,96" fill="white"/>
+  <text x="96" y="156" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">YK</text>
+</svg>
