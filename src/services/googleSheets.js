@@ -96,7 +96,8 @@ export class GoogleSheetsService {
   }
 
   getEmbedUrl(videoId) {
-    return `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`
+    // Use playlist parameter to loop the same video and prevent end screen
+    return `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&showinfo=0&controls=1&fs=1&cc_load_policy=0&iv_load_policy=3&autohide=1&playlist=${videoId}&loop=1`
   }
 }
 

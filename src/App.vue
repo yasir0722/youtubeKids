@@ -98,6 +98,7 @@
             <div class="modal-content" @click.stop @touchend.stop>
                 <button class="close-button" @click="closeVideo" @touchend="closeVideo" aria-label="Close video player">×</button>
                 <iframe
+                    id="youtube-player"
                     class="video-player"
                     :src="selectedVideo.embedUrl"
                     frameborder="0"
@@ -105,6 +106,7 @@
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     referrerpolicy="strict-origin-when-cross-origin"
                     loading="lazy"
+                    sandbox="allow-scripts allow-same-origin allow-presentation"
                 ></iframe>
                 <div class="modal-info">
                     <h3 class="modal-title">{{ selectedVideo.title }}</h3>
@@ -265,6 +267,15 @@ export default {
             // Prevent body scroll when modal is open (mobile)
             if (isMobile.value) {
                 document.body.style.overflow = 'hidden'
+            }
+            
+            // Auto-close modal after estimated video duration to prevent end screen
+            if (video.estimatedDuration) {
+                setTimeout(() => {
+                    if (selectedVideo.value?.id === video.id) {
+                        closeVideo()
+                    }
+                }, (video.estimatedDuration - 1) * 1000) // Close 1 second before end
             }
         }
 
