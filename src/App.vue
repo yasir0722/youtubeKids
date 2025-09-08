@@ -136,16 +136,29 @@ export default {
           const sheetsService = new GoogleSheetsService('')
           videos.value = sheetsService.processVideoData(config.sampleVideos)
         } else {
-          // Use Google Sheets service
-          const sheetsService = new GoogleSheetsService(config.googleSheets.url)
-          videos.value = await sheetsService.fetchVideoData()
+          try {
+            // Try to use Google Sheets service
+            const sheetsService = new GoogleSheetsService(config.googleSheets.url)
+            videos.value = await sheetsService.fetchVideoData()
+          } catch (sheetsError) {
+            console.warn('Google Sheets failed, trying fallback:', sheetsError)
+            
+            if (config.app.fallbackToSample) {
+              // Fallback to sample data
+              const sheetsService = new GoogleSheetsService('')
+              videos.value = sheetsService.processVideoData(config.sampleVideos)
+              error.value = 'Using sample data. Please check Google Sheets setup in GOOGLE_SHEETS_SETUP.md'
+            } else {
+              throw sheetsError
+            }
+          }
         }
 
       } catch (err) {
         console.error('Error fetching videos:', err)
         error.value = config.app.useSampleData 
           ? 'Failed to load sample videos.'
-          : 'Failed to load videos. Please check the Google Sheets URL in config.js and try again.'
+          : 'Failed to load videos from Google Sheets. Please check GOOGLE_SHEETS_SETUP.md for help.'
       } finally {
         loading.value = false
       }
