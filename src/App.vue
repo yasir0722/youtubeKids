@@ -67,15 +67,17 @@
     </main>
 
     <!-- Video Modal -->
-    <div v-if="selectedVideo" class="modal-overlay" @click="closeVideo">
-      <div class="modal-content" @click.stop>
-        <button class="close-button" @click="closeVideo">×</button>
+    <div v-if="selectedVideo" class="modal-overlay" @click="closeVideo" @touchend="closeVideo">
+      <div class="modal-content" @click.stop @touchend.stop>
+        <button class="close-button" @click="closeVideo" @touchend="closeVideo" aria-label="Close video player">×</button>
         <iframe
           class="video-player"
           :src="selectedVideo.embedUrl"
           frameborder="0"
           allowfullscreen
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          loading="lazy"
         ></iframe>
         <div class="modal-info">
           <h3 class="modal-title">{{ selectedVideo.title }}</h3>
@@ -99,6 +101,21 @@ export default {
     const error = ref(null)
     const selectedVideo = ref(null)
     const isDarkMode = ref(false)
+
+    // Mobile detection
+    const isMobile = ref(false)
+
+    // Initialize mobile detection
+    const initializeMobile = () => {
+      const checkMobile = () => {
+        isMobile.value = window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      }
+      
+      checkMobile()
+      window.addEventListener('resize', checkMobile)
+      
+      return () => window.removeEventListener('resize', checkMobile)
+    }
 
     // Initialize theme from localStorage or default to light mode
     const initializeTheme = () => {
@@ -166,15 +183,38 @@ export default {
 
     const openVideo = (video) => {
       selectedVideo.value = video
+      // Prevent body scroll when modal is open (mobile)
+      if (isMobile.value) {
+        document.body.style.overflow = 'hidden'
+      }
     }
 
     const closeVideo = () => {
       selectedVideo.value = null
+      // Restore body scroll (mobile)
+      if (isMobile.value) {
+        document.body.style.overflow = ''
+      }
     }
 
     onMounted(() => {
       initializeTheme()
+      const cleanupMobile = initializeMobile()
       fetchVideos()
+      
+      // Remove initial loading spinner
+      const loadingElement = document.querySelector('.initial-loading')
+      if (loadingElement) {
+        setTimeout(() => {
+          loadingElement.style.opacity = '0'
+          setTimeout(() => {
+            loadingElement.remove()
+          }, 300)
+        }, 500)
+      }
+      
+      // Cleanup on unmount
+      return cleanupMobile
     })
 
     return {
@@ -183,6 +223,7 @@ export default {
       error,
       selectedVideo,
       isDarkMode,
+      isMobile,
       openVideo,
       closeVideo,
       toggleTheme
