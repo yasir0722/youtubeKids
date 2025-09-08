@@ -97,17 +97,21 @@
         <div v-if="selectedVideo" class="modal-overlay" @click="closeVideo" @touchend="closeVideo">
             <div class="modal-content" @click.stop @touchend.stop>
                 <button class="close-button" @click="closeVideo" @touchend="closeVideo" aria-label="Close video player">×</button>
-                <iframe
-                    id="youtube-player"
-                    class="video-player"
-                    :src="selectedVideo.embedUrl"
-                    frameborder="0"
-                    allowfullscreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerpolicy="strict-origin-when-cross-origin"
-                    loading="lazy"
-                    sandbox="allow-scripts allow-same-origin allow-presentation"
-                ></iframe>
+                <div class="video-container">
+                    <iframe
+                        id="youtube-player"
+                        class="video-player"
+                        :src="selectedVideo.embedUrl"
+                        frameborder="0"
+                        allowfullscreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        loading="lazy"
+                        sandbox="allow-scripts allow-same-origin allow-presentation"
+                    ></iframe>
+                    <!-- Overlay to block "More videos" suggestions -->
+                    <div class="video-overlay-blocker"></div>
+                </div>
                 <div class="modal-info">
                     <h3 class="modal-title">{{ selectedVideo.title }}</h3>
                     <p class="modal-description">{{ selectedVideo.description }}</p>
@@ -269,14 +273,69 @@ export default {
                 document.body.style.overflow = 'hidden'
             }
             
-            // Auto-close modal after estimated video duration to prevent end screen
-            if (video.estimatedDuration) {
-                setTimeout(() => {
-                    if (selectedVideo.value?.id === video.id) {
-                        closeVideo()
-                    }
-                }, (video.estimatedDuration - 1) * 1000) // Close 1 second before end
+            // Start monitoring for suggestion overlays and set playback speed
+            setTimeout(() => {
+                startOverlayBlocker()
+                setPlaybackSpeed()
+            }, 2000)
+        }
+
+        const setPlaybackSpeed = () => {
+            const iframe = document.getElementById('youtube-player')
+            if (!iframe) return
+            
+            // Try to set playback speed using postMessage API
+            try {
+                iframe.contentWindow.postMessage('{"event":"command","func":"setPlaybackRate","args":[0.75]}', '*')
+            } catch (error) {
+                console.log('Could not set playback speed:', error)
             }
+            
+            // Keep trying to set speed for a few seconds in case video isn't ready
+            let attempts = 0
+            const speedSetter = setInterval(() => {
+                attempts++
+                if (attempts > 10) {
+                    clearInterval(speedSetter)
+                    return
+                }
+                
+                try {
+                    iframe.contentWindow.postMessage('{"event":"command","func":"setPlaybackRate","args":[0.75]}', '*')
+                } catch (error) {
+                    // Ignore errors
+                }
+            }, 1000)
+        }
+
+        const startOverlayBlocker = () => {
+            // Periodically check and hide any suggestion overlays
+            const overlayChecker = setInterval(() => {
+                const iframe = document.getElementById('youtube-player')
+                if (!iframe || !selectedVideo.value) {
+                    clearInterval(overlayChecker)
+                    return
+                }
+                
+                try {
+                    // Try to access iframe content (will fail due to CORS but worth trying)
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
+                    if (iframeDoc) {
+                        // Hide any suggestion elements if accessible
+                        const suggestions = iframeDoc.querySelectorAll('[class*="suggestion"], [class*="endscreen"], [class*="related"]')
+                        suggestions.forEach(el => el.style.display = 'none')
+                    }
+                } catch (error) {
+                    // Expected CORS error, ignore
+                }
+            }, 1000)
+            
+            // Clear interval when video is closed
+            setTimeout(() => {
+                if (!selectedVideo.value) {
+                    clearInterval(overlayChecker)
+                }
+            }, 100)
         }
 
         const closeVideo = () => {
@@ -292,6 +351,9 @@ export default {
             const cleanupMobile = initializeMobile()
             fetchVideos()
             
+            // Add message listener for YouTube API communication
+            window.addEventListener('message', handleYouTubeMessage)
+            
             // Remove initial loading spinner
             const loadingElement = document.querySelector('.initial-loading')
             if (loadingElement) {
@@ -304,8 +366,25 @@ export default {
             }
             
             // Cleanup on unmount
-            return cleanupMobile
+            return () => {
+                cleanupMobile()
+                window.removeEventListener('message', handleYouTubeMessage)
+            }
         })
+
+        const handleYouTubeMessage = (event) => {
+            if (event.origin !== 'https://www.youtube-nocookie.com') return
+            
+            try {
+                const data = JSON.parse(event.data)
+                if (data.event === 'video-progress') {
+                    // Video is playing, ensure speed is set
+                    setTimeout(() => setPlaybackSpeed(), 500)
+                }
+            } catch (error) {
+                // Ignore parsing errors
+            }
+        }
 
         return {
             videos,

@@ -96,8 +96,9 @@ export class GoogleSheetsService {
   }
 
   getEmbedUrl(videoId) {
-    // Use playlist parameter to loop the same video and prevent end screen
-    return `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&showinfo=0&controls=1&fs=1&cc_load_policy=0&iv_load_policy=3&autohide=1&playlist=${videoId}&loop=1`
+    // Use youtube-nocookie.com and comprehensive parameters to prevent suggestions
+    // Set playback speed to 0.75x for better comprehension for kids
+    return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&showinfo=0&controls=1&fs=1&cc_load_policy=0&iv_load_policy=3&autohide=0&disablekb=1&playsinline=1&widget_referrer=${encodeURIComponent(window.location.origin)}&start=0&enablejsapi=1`
   }
 }
 

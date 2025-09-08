@@ -770,3 +770,62 @@ body {
         width: 100%;
     }
 }
+
+/* Hide YouTube's "More videos" overlay */
+.video-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.video-player {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.video-overlay-blocker {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 120px;
+    height: 80px;
+    background: transparent;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Block the bottom area where suggestions appear */
+.video-overlay-blocker::after {
+    content: '';
+    position: absolute;
+    bottom: 60px;
+    right: 10px;
+    width: 100px;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    border-radius: 4px;
+}
+
+.video-player::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: transparent;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Additional YouTube overlay hiding */
+iframe[src*="youtube.com"] {
+    position: relative;
+}
+
+/* Hide specific YouTube elements that might show suggestions */
+.video-modal .modal-content {
+    overflow: hidden;
+}
