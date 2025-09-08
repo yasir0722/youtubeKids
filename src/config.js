@@ -83,13 +83,6 @@ export const config = {
 
   // Default video types
   defaultTypes: [
-    "All",
-    "Education", 
-    "Music",
-    "Stories",
-    "Exercise",
-    "Games",
-    "Science",
-    "Art"
+    "All"
   ]
 }

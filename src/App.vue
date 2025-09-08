@@ -184,11 +184,24 @@ export default {
                     // Use sample data for demonstration
                     const sheetsService = new GoogleSheetsService('')
                     videos.value = sheetsService.processVideoData(config.sampleVideos)
+                    // Use default types for sample data
+                    initializeTypes()
                 } else {
                     try {
                         // Try to use Google Sheets service
                         const sheetsService = new GoogleSheetsService(config.googleSheets.url)
-                        videos.value = await sheetsService.fetchVideoData()
+                        
+                        // Fetch both videos and types
+                        const [videosData, typesData] = await Promise.all([
+                            sheetsService.fetchVideoData(),
+                            sheetsService.fetchVideoTypes()
+                        ])
+                        
+                        videos.value = videosData
+                        
+                        // Initialize types with data from second sheet
+                        initializeTypes(typesData)
+                        
                     } catch (sheetsError) {
                         console.warn('Google Sheets failed, trying fallback:', sheetsError)
                         
@@ -196,6 +209,7 @@ export default {
                             // Fallback to sample data
                             const sheetsService = new GoogleSheetsService('')
                             videos.value = sheetsService.processVideoData(config.sampleVideos)
+                            initializeTypes()
                             error.value = 'Using sample data. Please check Google Sheets setup in GOOGLE_SHEETS_SETUP.md'
                         } else {
                             throw sheetsError
@@ -203,8 +217,7 @@ export default {
                     }
                 }
 
-                // Initialize types and filters after loading videos
-                initializeTypes()
+                // Filter videos after loading
                 filterVideos()
 
             } catch (err) {
@@ -218,9 +231,16 @@ export default {
         }
 
         // Initialize available types from videos and config
-        const initializeTypes = () => {
+        const initializeTypes = (sheetTypes = []) => {
             const videoTypes = [...new Set(videos.value.map(video => video.type).filter(Boolean))]
-            const allTypes = [...new Set([...config.defaultTypes.slice(1), ...videoTypes])]
+            
+            // Combine types from: sheet second tab, video data, and default types
+            const allTypes = [...new Set([
+                ...config.defaultTypes.slice(1), // Skip 'All' from defaults
+                ...sheetTypes, // Types from second sheet
+                ...videoTypes // Types found in video data
+            ])]
+            
             availableTypes.value = allTypes.sort()
         }
 
