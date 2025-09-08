@@ -2,20 +2,36 @@
 
 A Vue.js web application that reads YouTube video links from a public Google Sheet and displays them in a YouTube-like interface.
 
+## 🌐 Live Demo
+**[View Live App](https://yasir0722.github.io/youtubeKids)**
+
 ## Features
 
 - 📺 Clean, YouTube-inspired interface
 - 📊 Reads video data from Google Sheets
 - 🎬 Modal video player with YouTube embed
 - 📱 Responsive design for all devices
+- 🌙 Dark/Light mode toggle
 - ⚡ Fast loading with Vite
 
-## Setup Instructions
+## Quick Start
 
 ### 1. Install Dependencies
 
 ```bash
 npm install
+```
+
+### 2. Run Development Server
+
+```bash
+npm run dev
+```
+
+### 3. Deploy to GitHub Pages
+
+```bash
+npm run deploy
 ```
 
 ### 2. Configure Google Sheets
