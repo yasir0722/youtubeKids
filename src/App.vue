@@ -8,8 +8,14 @@
             <div class="logo-icon">YK</div>
             <span>YouTube Kids</span>
           </div>
-          <div>
-            <span v-if="videos.length > 0">{{ videos.length }} videos available</span>
+          <div class="header-right">
+            <button class="theme-toggle" @click="toggleTheme">
+              <span class="theme-icon">{{ isDarkMode ? '☀️' : '🌙' }}</span>
+              <span>{{ isDarkMode ? 'Light' : 'Dark' }}</span>
+            </button>
+            <div>
+              <span v-if="videos.length > 0">{{ videos.length }} videos available</span>
+            </div>
           </div>
         </div>
       </div>
@@ -92,6 +98,33 @@ export default {
     const loading = ref(true)
     const error = ref(null)
     const selectedVideo = ref(null)
+    const isDarkMode = ref(false)
+
+    // Initialize theme from localStorage or default to light mode
+    const initializeTheme = () => {
+      const savedTheme = localStorage.getItem('youtube-kids-theme')
+      if (savedTheme) {
+        isDarkMode.value = savedTheme === 'dark'
+      } else {
+        // Check user's system preference
+        isDarkMode.value = window.matchMedia('(prefers-color-scheme: dark)').matches
+      }
+      applyTheme()
+    }
+
+    const applyTheme = () => {
+      if (isDarkMode.value) {
+        document.documentElement.setAttribute('data-theme', 'dark')
+      } else {
+        document.documentElement.removeAttribute('data-theme')
+      }
+    }
+
+    const toggleTheme = () => {
+      isDarkMode.value = !isDarkMode.value
+      localStorage.setItem('youtube-kids-theme', isDarkMode.value ? 'dark' : 'light')
+      applyTheme()
+    }
 
     const fetchVideos = async () => {
       try {
@@ -127,6 +160,7 @@ export default {
     }
 
     onMounted(() => {
+      initializeTheme()
       fetchVideos()
     })
 
@@ -135,8 +169,10 @@ export default {
       loading,
       error,
       selectedVideo,
+      isDarkMode,
       openVideo,
-      closeVideo
+      closeVideo,
+      toggleTheme
     }
   }
 }

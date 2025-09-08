@@ -23,6 +23,12 @@ export const config = {
     // Number of videos to show per page (future feature)
     videosPerPage: 12,
     
+    // Theme settings
+    theme: {
+      defaultMode: 'auto', // 'light', 'dark', or 'auto' (follows system preference)
+      persistTheme: true   // Save user's theme preference
+    },
+    
     // Video player settings
     player: {
       autoplay: true,
